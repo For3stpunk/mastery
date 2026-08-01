@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Mastery Commons</title>
+  <meta name="description" content="A leveling system for going from knowing nothing about a subject to genuine mastery of it — across music, books, art, architecture, and any subject you add." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Spectral:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app"></div>
+
+  <!-- Core rules: dimensions, Bloom's levels, activity types, tiers -->
+  <script src="data/model.js"></script>
+
+  <!-- Subject content — add new <script> tags here as you add subjects.
+       See data/subjects/_template.js for the pattern. -->
+  <script src="data/subjects/music.js"></script>
+  <script src="data/subjects/books.js"></script>
+  <script src="data/subjects/art.js"></script>
+  <script src="data/subjects/architecture.js"></script>
+
+  <!-- Engine + persistence -->
+  <script src="js/leveling.js"></script>
+  <script src="js/heatmap.js"></script>
+  <script src="js/storage.js"></script>
+
+  <!-- UI -->
+  <script src="js/app.js"></script>
+</body>
+</html>
