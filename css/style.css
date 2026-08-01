@@ -7,8 +7,8 @@
    ------------------------------------------------------------------- */
 
 :root {
-  --color-parchment: #ede4d2;
-  --color-parchment-dark: #e3d8c0;
+  --color-parchment: #fbfaf8;
+  --color-parchment-dark: #eeece7;
   --color-ink: #23201b;
   --color-ink-soft: #4a4437;
   --color-navy: #1c2333;
@@ -17,8 +17,8 @@
   --color-rule: #c9bc9c;
   --color-danger: #8a3b2f;
 
-  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
-  --font-body: "Spectral", "Iowan Old Style", Georgia, serif;
+  --font-display: "Bodoni Moda", "Didot", Georgia, serif;
+  --font-body: "Libre Baskerville", "Baskerville", Georgia, serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 
   --radius: 3px;
@@ -109,7 +109,7 @@ a {
 /* ---------------- Panels ---------------- */
 
 .panel {
-  background: rgba(255, 255, 255, 0.28);
+  background: #ffffff;
   border: 1px solid var(--color-rule);
   border-radius: var(--radius);
   box-shadow: var(--shadow-card);
@@ -192,7 +192,7 @@ a {
   padding: 3px 8px;
   border-radius: 999px;
   border: 1px solid var(--color-rule);
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--color-parchment-dark);
 }
 
 /* ---------------- Subject detail header ---------------- */

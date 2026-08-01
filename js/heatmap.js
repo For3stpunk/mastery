@@ -107,10 +107,12 @@
     start.setDate(start.getDate() - (weeks * 7 - 1));
     start.setDate(start.getDate() - start.getDay()); // roll back to Sunday
 
-    const COLORS = ["#e3d8c0", "#a9c2b3", "#6a9a80", "#3f6e58"];
+    const COLORS = ["#eeece7", "#a9c2b3", "#6a9a80", "#3f6e58"];
     const levelFor = (count) => (count === 0 ? 0 : count === 1 ? 1 : count <= 3 ? 2 : 3);
+    const todayKeyStr = dayKey(today);
 
     let cellsSVG = "";
+    let todayMarkerSVG = "";
     let monthLabelsSVG = "";
     let lastMonth = -1;
 
@@ -123,7 +125,17 @@
         const count = counts[key] || 0;
         const x = leftPad + w * step;
         const y = topPad + d * step;
-        cellsSVG += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="2" fill="${COLORS[levelFor(count)]}"><title>${key}: ${count} activit${count === 1 ? "y" : "ies"}</title></rect>`;
+        // Every cell gets a visible outline (var(--color-rule)) regardless
+        // of fill — the empty-day color was previously close enough to
+        // the page background to make empty cells look like they weren't
+        // rendering at all.
+        cellsSVG += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="2" fill="${COLORS[levelFor(count)]}" stroke="#C9BC9C" stroke-width="0.75"><title>${key}: ${count} activit${count === 1 ? "y" : "ies"}</title></rect>`;
+
+        if (key === todayKeyStr) {
+          // A distinct brass-colored ring marks today's cell specifically,
+          // on top of whatever fill color it already has.
+          todayMarkerSVG = `<rect x="${x - 1.5}" y="${y - 1.5}" width="${cellSize + 3}" height="${cellSize + 3}" rx="3" fill="none" stroke="#B4893F" stroke-width="1.75"><title>Today (${key})</title></rect>`;
+        }
 
         if (d === 0 && date.getMonth() !== lastMonth) {
           lastMonth = date.getMonth();
@@ -148,6 +160,7 @@
       ${monthLabelsSVG}
       ${dayLabelsSVG}
       ${cellsSVG}
+      ${todayMarkerSVG}
     </svg>`;
   }
 

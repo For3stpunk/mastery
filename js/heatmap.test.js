@@ -65,4 +65,15 @@ const svg = heatmapSVG(counts2, 10);
 assert(svg.includes("<svg"), "heatmap produces an SVG string");
 assert((svg.match(/<rect/g) || []).length > 0, "heatmap produces at least one cell");
 
+// Test 7: every cell has a visible outline regardless of its fill color
+// (previously the empty-day fill was nearly the same shade as the page
+// background, making empty cells look like they weren't rendering)
+assert(svg.includes('stroke="#C9BC9C"'), "heatmap cells have a visible outline stroke");
+
+// Test 8: today's cell always gets its own distinct marker so it can be
+// found at a glance, even with zero activities logged today
+const emptyHeatmap = heatmapSVG({}, 4);
+assert(emptyHeatmap.includes('stroke="#B4893F"'), "today's cell gets a distinct marker even with no activity logged yet");
+assert(emptyHeatmap.includes("Today ("), "today's cell marker includes an identifiable tooltip");
+
 console.log("\nDone.");
