@@ -123,9 +123,11 @@
     const totalDays = Math.round((today - gridStart) / 86400000) + 1;
     const weeks = Math.ceil(totalDays / 7);
 
-    // Ink/parchment scale (no red/green) — empty stays parchment, and
-    // each activity level steps darker, topping out at true ink black.
-    const COLORS = ["#ddd6c2", "#c9bc9c", "#6b6354", "#23201b"];
+    // Ink/parchment scale (no red/green) — empty cells use a clearly
+    // visible warm grey (NOT a near-white tint) so they read against a
+    // white panel; each activity level steps darker from there, topping
+    // out at true ink black.
+    const COLORS = ["#c9bc9c", "#a08e68", "#6b6354", "#23201b"];
     const levelFor = (count) => (count === 0 ? 0 : count === 1 ? 1 : count <= 3 ? 2 : 3);
     const todayKeyStr = dayKey(today);
 
@@ -149,7 +151,7 @@
         const x = w * step;
         const y = topPad + d * step;
 
-        cellsSVG += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="2" fill="${COLORS[levelFor(count)]}" stroke="#C9BC9C" stroke-width="0.75"><title>${key}: ${count} activit${count === 1 ? "y" : "ies"}</title></rect>`;
+        cellsSVG += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="2" style="fill:${COLORS[levelFor(count)]} !important; stroke:#C9BC9C !important; stroke-width:0.75"><title>${key}: ${count} activit${count === 1 ? "y" : "ies"}</title></rect>`;
 
         if (key === todayKeyStr) {
           // A distinct brass-colored ring marks today's cell specifically,
