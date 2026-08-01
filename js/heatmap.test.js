@@ -1,4 +1,4 @@
-const { computeDailyActivityCounts, computeGlobalStreak, heatmapSVG } = require("./heatmap.js");
+const { dayKey, computeDailyActivityCounts, computeGlobalStreak, heatmapSVG } = require("./heatmap.js");
 
 function assert(cond, msg) {
   if (!cond) {
@@ -75,5 +75,31 @@ assert(svg.includes('stroke="#C9BC9C"'), "heatmap cells have a visible outline s
 const emptyHeatmap = heatmapSVG({}, 4);
 assert(emptyHeatmap.includes('stroke="#B4893F"'), "today's cell gets a distinct marker even with no activity logged yet");
 assert(emptyHeatmap.includes("Today ("), "today's cell marker includes an identifiable tooltip");
+
+// Test 9: today's cell must always be the top-left cell (x=0, y=topPad)
+// of the grid — the grid starts today and calculates forward, so today
+// needs zero scrolling to see, filling each column top-to-bottom before
+// moving right to the next column.
+const todayForPositionTest = new Date();
+const todayKeyForPositionTest = dayKey(todayForPositionTest);
+const positionSvg = heatmapSVG({ [todayKeyForPositionTest]: 2 }, 91);
+const titleIdx = positionSvg.indexOf(`<title>${todayKeyForPositionTest}:`);
+const rectStart = positionSvg.lastIndexOf("<rect", titleIdx);
+const rectTag = positionSvg.slice(rectStart, positionSvg.indexOf(">", rectStart) + 1);
+assert(rectTag.includes('x="0"') && rectTag.includes('y="16"'), `today's cell is the top-left cell of the grid (x=0, y=16=topPad) (got: ${rectTag})`);
+
+// Test 10: future days (not yet happened) still render as empty
+// placeholders, not errors or omissions — the grid should visibly
+// extend forward even before those days have any activity.
+const futureSvg = heatmapSVG({}, 10);
+const futureRectCount = (futureSvg.match(/<rect/g) || []).length;
+// 10 day cells + 1 today-marker ring (also a <rect>) = 11
+assert(futureRectCount === 11, `grid renders all 10 requested days as placeholders plus the today marker (got ${futureRectCount})`);
+
+// Test 11: the grid actually wraps into multiple rows/columns rather
+// than staying a single row — confirms it's a calendar grid, not a strip.
+const gridSvg = heatmapSVG({}, 21); // 3 full weeks
+const secondColumnCell = gridSvg.includes('x="16"'); // step=13+3=16, so column 2 starts at x=16
+assert(secondColumnCell, "grid wraps into a second column after 7 days, confirming a true grid layout");
 
 console.log("\nDone.");

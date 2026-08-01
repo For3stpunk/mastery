@@ -93,42 +93,44 @@
    * columns (Sunday-aligned) of 7 rows, most recent week on the right,
    * ending today. Each cell gets an <title> for a native hover tooltip.
    */
-  function heatmapSVG(counts, weeks) {
-    weeks = weeks || 53;
-    const cellSize = 11,
+  function heatmapSVG(counts, days) {
+    days = days || 91; // 13 exact weeks of 7 — a clean grid, no partial trailing column
+    const cellSize = 13,
       gap = 3,
       step = cellSize + gap,
-      leftPad = 28, // room for day-of-week labels
       topPad = 16; // room for month labels
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const start = new Date(today);
-    start.setDate(start.getDate() - (weeks * 7 - 1));
-    start.setDate(start.getDate() - start.getDay()); // roll back to Sunday
 
     const COLORS = ["#eeece7", "#a9c2b3", "#6a9a80", "#3f6e58"];
     const levelFor = (count) => (count === 0 ? 0 : count === 1 ? 1 : count <= 3 ? 2 : 3);
     const todayKeyStr = dayKey(today);
+    const weeks = Math.ceil(days / 7);
 
     let cellsSVG = "";
     let todayMarkerSVG = "";
     let monthLabelsSVG = "";
     let lastMonth = -1;
 
+    // A calendar grid — 7 rows per column, columns left-to-right — but
+    // anchored at TODAY instead of a calendar week boundary: cell (0,0)
+    // is today, and every other cell counts forward from there, filling
+    // each column top-to-bottom before moving to the next column right.
+    // Today is always the very first cell, so it's visible with zero
+    // scrolling, and cells fill in with color as each day actually
+    // happens (future days render as empty placeholders until then).
     for (let w = 0; w < weeks; w++) {
       for (let d = 0; d < 7; d++) {
-        const date = new Date(start);
-        date.setDate(date.getDate() + w * 7 + d);
-        if (date > today) continue;
+        const i = w * 7 + d;
+        if (i >= days) continue;
+        const date = new Date(today);
+        date.setDate(date.getDate() + i);
         const key = dayKey(date);
         const count = counts[key] || 0;
-        const x = leftPad + w * step;
+        const x = w * step;
         const y = topPad + d * step;
-        // Every cell gets a visible outline (var(--color-rule)) regardless
-        // of fill — the empty-day color was previously close enough to
-        // the page background to make empty cells look like they weren't
-        // rendering at all.
+
         cellsSVG += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="2" fill="${COLORS[levelFor(count)]}" stroke="#C9BC9C" stroke-width="0.75"><title>${key}: ${count} activit${count === 1 ? "y" : "ies"}</title></rect>`;
 
         if (key === todayKeyStr) {
@@ -144,21 +146,11 @@
       }
     }
 
-    const dayLabels = ["", "Mon", "", "Wed", "", "Fri", ""];
-    const dayLabelsSVG = dayLabels
-      .map((label, d) =>
-        label
-          ? `<text x="0" y="${topPad + d * step + cellSize - 1}" font-size="9" fill="#4A4437" font-family="var(--font-mono)">${label}</text>`
-          : ""
-      )
-      .join("");
-
-    const width = leftPad + weeks * step;
+    const width = weeks * step;
     const height = topPad + 7 * step;
 
     return `<svg viewBox="0 0 ${width} ${height}" class="heatmap" role="img" aria-label="Activity heatmap">
       ${monthLabelsSVG}
-      ${dayLabelsSVG}
       ${cellsSVG}
       ${todayMarkerSVG}
     </svg>`;

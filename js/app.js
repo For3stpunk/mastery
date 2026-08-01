@@ -266,8 +266,8 @@
         el("div", { class: "streak-stat" }, el("span", { class: "streak-number" }, String(streak.longest)), el("span", { class: "streak-label" }, "longest streak")),
         el("div", { class: "streak-stat" }, el("span", { class: "streak-number" }, String(totalDaysActive)), el("span", { class: "streak-label" }, "days logged, all time"))
       ),
-      el("div", { class: "heatmap-wrap", innerHTML: HEATMAP.heatmapSVG(counts, 53) }),
-      el("p", { class: "heatmap-caption" }, "Every subject counts toward this — quizzes, check-ins, journaling, essays, and connections all fill in a day. Hover a square for the date.")
+      el("div", { class: "heatmap-wrap", innerHTML: HEATMAP.heatmapSVG(counts, 91) }),
+      el("p", { class: "heatmap-caption" }, "Starts today (top-left) and calculates forward — every subject counts toward it: quizzes, check-ins, journaling, essays, and connections fill in a day as it happens. Hover a square for the date.")
     );
   }
 
