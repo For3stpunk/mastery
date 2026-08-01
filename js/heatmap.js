@@ -125,7 +125,7 @@
 
     // Ink/parchment scale (no red/green) — empty stays parchment, and
     // each activity level steps darker, topping out at true ink black.
-    const COLORS = ["#eeece7", "#c9bc9c", "#6b6354", "#23201b"];
+    const COLORS = ["#ddd6c2", "#c9bc9c", "#6b6354", "#23201b"];
     const levelFor = (count) => (count === 0 ? 0 : count === 1 ? 1 : count <= 3 ? 2 : 3);
     const todayKeyStr = dayKey(today);
 
