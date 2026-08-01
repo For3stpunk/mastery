@@ -1,4 +1,4 @@
-# The Mastery Commons
+# Mastery
 
 A leveling system for going from knowing nothing about a subject to
 genuine, recognized expertise in it — built for music, books, art, and
@@ -89,6 +89,11 @@ js/heatmap.test.js             `node js/heatmap.test.js` — streak edge
                                cases (grace period, broken streaks,
                                longest-vs-current).
 js/storage.js                 localStorage persistence + export/import.
+                               Migrates progress forward automatically
+                               if the storage key name ever changes.
+js/storage.test.js            `node js/storage.test.js` — storage
+                               migration + cross-timezone date handling
+                               (both caught real bugs during development).
 js/app.js                     All DOM rendering and event handling.
 docs/DESIGN.md                Why the system is shaped this way.
 smoke_test.js                 Loads the whole app in a simulated
@@ -108,6 +113,7 @@ Node and `jsdom`:
 npm install jsdom
 node js/leveling.test.js     # pure logic tests, no browser needed
 node js/heatmap.test.js      # streak edge cases, no browser needed
+node js/storage.test.js      # storage migration + timezone correctness
 node smoke_test.js           # does the app render at all?
 node interaction_test.js     # do clicks/forms actually work end to end?
 ```

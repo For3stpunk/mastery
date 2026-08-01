@@ -8,7 +8,8 @@
  * -----------------------------------------------------------------------
  */
 (function (root) {
-  const STORAGE_KEY = "mastery-commons:v1";
+  const STORAGE_KEY = "mastery:v1";
+  const LEGACY_STORAGE_KEYS = ["mastery-commons:v1"]; // older key names, for migration only
 
   function emptyState() {
     return {
@@ -25,7 +26,23 @@
 
   function load() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      let raw = localStorage.getItem(STORAGE_KEY);
+
+      // Migration: if nothing's under the current key yet, check older key
+      // names before giving up and returning a blank slate. This matters
+      // because renaming the storage key (e.g. for a rebrand) would
+      // otherwise silently orphan everything someone had already logged.
+      if (!raw) {
+        for (const legacyKey of LEGACY_STORAGE_KEYS) {
+          const legacyRaw = localStorage.getItem(legacyKey);
+          if (legacyRaw) {
+            raw = legacyRaw;
+            localStorage.setItem(STORAGE_KEY, legacyRaw); // migrate forward
+            break;
+          }
+        }
+      }
+
       if (!raw) return emptyState();
       const parsed = JSON.parse(raw);
       return Object.assign(emptyState(), parsed);

@@ -1,6 +1,6 @@
 # Design rationale
 
-This document explains the pedagogical model behind The Mastery Commons —
+This document explains the pedagogical model behind Mastery —
 what it's actually trying to measure, and why it's built to resist the
 usual failure mode of gamified learning tools (where "level 99" means
 "clicked a lot," not "knows a lot").

@@ -10,9 +10,15 @@
  */
 (function (root) {
   function dayKey(date) {
+    // Use LOCAL calendar date components directly — never round-trip
+    // through toISOString(), which reports the UTC date and silently
+    // shifts the "day" by one for anyone not near UTC+0 (a day earlier
+    // for timezones ahead of UTC, a day later for timezones behind it).
     const d = new Date(date);
-    d.setHours(0, 0, 0, 0);
-    return d.toISOString().slice(0, 10);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
   }
 
   /**

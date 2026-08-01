@@ -19,8 +19,12 @@
   }
 
   function todayKey(date) {
-    const d = date ? new Date(date) : new Date();
-    return d.toISOString().slice(0, 10);
+    // Delegate to the single corrected implementation in heatmap.js —
+    // this used to be its own separate (and separately buggy) UTC-based
+    // calculation, which meant per-subject streaks and the global
+    // heatmap could disagree about which calendar day an activity fell
+    // on. There should only ever be one definition of "what day is it."
+    return HEATMAP.dayKey(date || new Date());
   }
 
   function daysBetween(a, b) {
@@ -271,7 +275,7 @@
     return el(
       "header",
       { class: "site-header" },
-      el("h1", {}, "The Mastery Commons"),
+      el("h1", {}, "Mastery"),
       el("p", { class: "site-tagline" }, "A ledger for the long walk from knowing nothing to knowing more than almost anyone.")
     );
   }
@@ -282,7 +286,7 @@
       const blob = new Blob([STORAGE.exportJSON(state)], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "mastery-commons-progress.json";
+      a.download = "mastery-progress.json";
       a.click();
     });
 
