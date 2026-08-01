@@ -9,6 +9,11 @@
  * -----------------------------------------------------------------------
  */
 (function (root) {
+  // The heatmap is a real calendar, not a rolling window: it always
+  // starts on this fixed date and grows forward, one column at a time,
+  // as days actually pass — exactly like a GitHub contribution graph.
+  const START_DATE = new Date(2026, 6, 31); // July 31, 2026
+
   function dayKey(date) {
     // Use LOCAL calendar date components directly — never round-trip
     // through toISOString(), which reports the UTC date and silently
@@ -89,12 +94,15 @@
   }
 
   /**
-   * Builds a GitHub-style contribution grid as an SVG string: `weeks`
-   * columns (Sunday-aligned) of 7 rows, most recent week on the right,
-   * ending today. Each cell gets an <title> for a native hover tooltip.
+   * Builds a GitHub-style contribution grid as an SVG string: 7 rows
+   * (Sun–Sat, top to bottom), columns running left to right in real
+   * calendar-week order, starting the week that contains START_DATE
+   * and ending on today's column. Time flows chronologically — oldest
+   * on the left, today on the right — and the grid grows by one column
+   * each week as real time passes. Each cell gets a <title> for a
+   * native hover tooltip.
    */
-  function heatmapSVG(counts, days) {
-    days = days || 91; // 13 exact weeks of 7 — a clean grid, no partial trailing column
+  function heatmapSVG(counts) {
     const cellSize = 13,
       gap = 3,
       step = cellSize + gap,
@@ -103,29 +111,39 @@
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const COLORS = ["#eeece7", "#a9c2b3", "#6a9a80", "#3f6e58"];
+    const start = new Date(START_DATE);
+    start.setHours(0, 0, 0, 0);
+
+    // Align the grid to the Sunday on/before START_DATE so weekday rows
+    // (Sun..Sat) line up the way a real calendar does — the same way
+    // GitHub's own graph pads out the first, partial week.
+    const gridStart = new Date(start);
+    gridStart.setDate(gridStart.getDate() - gridStart.getDay());
+
+    const totalDays = Math.round((today - gridStart) / 86400000) + 1;
+    const weeks = Math.ceil(totalDays / 7);
+
+    // Ink/parchment scale (no red/green) — empty stays parchment, and
+    // each activity level steps darker, topping out at true ink black.
+    const COLORS = ["#eeece7", "#c9bc9c", "#6b6354", "#23201b"];
     const levelFor = (count) => (count === 0 ? 0 : count === 1 ? 1 : count <= 3 ? 2 : 3);
     const todayKeyStr = dayKey(today);
-    const weeks = Math.ceil(days / 7);
 
     let cellsSVG = "";
     let todayMarkerSVG = "";
     let monthLabelsSVG = "";
     let lastMonth = -1;
 
-    // A calendar grid — 7 rows per column, columns left-to-right — but
-    // anchored at TODAY instead of a calendar week boundary: cell (0,0)
-    // is today, and every other cell counts forward from there, filling
-    // each column top-to-bottom before moving to the next column right.
-    // Today is always the very first cell, so it's visible with zero
-    // scrolling, and cells fill in with color as each day actually
-    // happens (future days render as empty placeholders until then).
     for (let w = 0; w < weeks; w++) {
       for (let d = 0; d < 7; d++) {
         const i = w * 7 + d;
-        if (i >= days) continue;
-        const date = new Date(today);
+        const date = new Date(gridStart);
         date.setDate(date.getDate() + i);
+
+        // Nothing to show before the real start date, and nothing to
+        // show for days that haven't happened yet.
+        if (date < start || date > today) continue;
+
         const key = dayKey(date);
         const count = counts[key] || 0;
         const x = w * step;
@@ -139,7 +157,7 @@
           todayMarkerSVG = `<rect x="${x - 1.5}" y="${y - 1.5}" width="${cellSize + 3}" height="${cellSize + 3}" rx="3" fill="none" stroke="#B4893F" stroke-width="1.75"><title>Today (${key})</title></rect>`;
         }
 
-        if (d === 0 && date.getMonth() !== lastMonth) {
+        if (date.getMonth() !== lastMonth) {
           lastMonth = date.getMonth();
           monthLabelsSVG += `<text x="${x}" y="${topPad - 5}" font-size="9" fill="#4A4437" font-family="var(--font-mono)">${date.toLocaleString("default", { month: "short" })}</text>`;
         }
@@ -156,7 +174,7 @@
     </svg>`;
   }
 
-  const api = { dayKey, computeDailyActivityCounts, computeGlobalStreak, heatmapSVG };
+  const api = { dayKey, computeDailyActivityCounts, computeGlobalStreak, heatmapSVG, START_DATE };
 
   if (typeof module !== "undefined" && module.exports) {
     module.exports = api;
